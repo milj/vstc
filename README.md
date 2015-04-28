@@ -1,2 +1,2 @@
 # vstc
-Very small twittter client
+Very small twitter client

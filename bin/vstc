@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+# this is ugly
+lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+
+require 'twitter_api'
+
+begin
+  puts 'Welcome to the Very Small Twitter Client, please enter username:'
+  username = gets
+  username.chomp!
+
+  client = TwitterAPI::Client.new
+  result_set = client.request('/1.1/search/tweets.json', q: "@#{ username }", result_type: 'recent')
+
+  # TODO: better formatting
+  puts "The latest tweets mentioning username #{ username }:"
+  result_set.results.each do |entry|
+    puts '-' * 146
+    puts "user: #{ entry['user']['screen_name'] }"
+    puts "text: #{ entry['text'] }"
+  end
+
+# TODO: better error handling
+rescue TwitterAPI::Errors::GeneralError => exc
+  puts exc.message
+  exit 1
+rescue Errno::ECONNREFUSED
+  puts 'Connection refused'
+  exit 1
+end
